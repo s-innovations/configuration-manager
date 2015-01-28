@@ -68,4 +68,4 @@ public void TestMethod1()
 
 
 ## Please star the repro
-if this kind of configuration is something you would use. I would put it into a nuget than.
+if this kind of configuration is something you would use. I would put it into a nuget then.
