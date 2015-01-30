@@ -22,6 +22,7 @@ But whats most interesting is that the CSO of the company can now manage the sec
 ```
 1) PS C:\> add-azureaccount
 2) PS C:\> Get-AzureSubscription
+2a)PS C:\> Select-AzureSubscription
 3) PS C:\> Set-ExecutionPolicy Unrestricted -Scope Process
 4) PS C:\> import-module C:\dev\KeyVaultScripts\KeyVaultManager
 5) PS C:\> Switch-AzureMode AzureResourceManager
