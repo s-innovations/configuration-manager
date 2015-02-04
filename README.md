@@ -70,3 +70,19 @@ public void TestMethod1()
 
 ## Please star the repro
 if this kind of configuration is something you would use. I would put it into a nuget then.
+
+
+### More keyvault commands
+```
+Manage Keys:
+Add-AzureKeyVaultKey
+Get-AzureKeyVaultKey
+Set-AzureKeyVaultKey
+Backup-AzureKeyVaultKey
+Restore-AzureKeyVaultKey
+Remove-AzureKeyVaultKey
+Manage Secrets:
+Get-AzureKeyVaultSecret
+Set-AzureKeyVaultSecret
+Remove-AzureKeyVaultSecret
+```
