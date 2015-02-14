@@ -8,9 +8,10 @@ namespace SInnovations.ConfigurationManager.Providers
 {
     public class AppSettingsProvider : ISettingsProvider
     {
+        private const string name = "app.config";
         public string Name
         {
-            get { return "app.config"; }
+            get { return name; }
         }
 
         public bool TryGetSetting(string settingName, out string settingValue)
