@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("S-Innovations.ConfigurationManager")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("A Configuration Manager for .Net")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyProduct("S-Innovations.ConfigurationManager")]
 [assembly: AssemblyCopyright("Copyright ©  2015")]
