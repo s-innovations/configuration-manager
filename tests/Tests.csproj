@@ -35,13 +35,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.KeyVault.Client, Version=1.0.0.26, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\Microsoft.KeyVault.Client.dll</HintPath>
+    <Reference Include="Microsoft.KeyVault.Client">
+      <HintPath>..\lib\Microsoft.KeyVault.Client.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.KeyVault.WebKey, Version=1.0.0.18, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\Microsoft.KeyVault.WebKey.dll</HintPath>
+    <Reference Include="Microsoft.KeyVault.WebKey">
+      <HintPath>..\lib\Microsoft.KeyVault.WebKey.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
