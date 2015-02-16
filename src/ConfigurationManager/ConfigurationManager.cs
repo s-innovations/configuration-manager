@@ -148,7 +148,7 @@ namespace SInnovations.ConfigurationManager
                 if (provider.TryGetSetting(settingName, out val))
                     return val;                
             }
-            if(val==string.Empty)
+            if(string.IsNullOrWhiteSpace(val))
             {
                 var d = defaultvalue();
                 if (d != null)
