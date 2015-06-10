@@ -10,29 +10,7 @@ using System.Threading.Tasks;
 namespace SInnovations.ConfigurationManager
 {
 
-    /// <summary>
-    /// Comparer for comparing two keys, handling equality as beeing greater
-    /// Use this Comparer e.g. with SortedLists or SortedDictionaries, that don't allow duplicate keys
-    /// </summary>
-    /// <typeparam name="TKey"></typeparam>
-    public class DuplicateKeyComparer<TKey>
-                    :
-                 IComparer<TKey> where TKey : IComparable
-    {
-        #region IComparer<TKey> Members
-
-        public int Compare(TKey x, TKey y)
-        {
-            int result = x.CompareTo(y);
-
-            if (result == 0)
-                return 1;   // Handle equality as beeing greater
-            else
-                return result;
-        }
-
-        #endregion
-    }
+  
 
     public class ConfigurationManager
     {
@@ -51,17 +29,36 @@ namespace SInnovations.ConfigurationManager
                 AddSettingsProvider(provider);
         }
 
+        /// <summary>
+        /// Get all registered providers except those named in <see cref="excludes"/>
+        /// </summary>
+        /// <param name="excludes">The providers to exclude</param>
+        /// <returns>Array of providernames</returns>
         public string[] GetProviders(params string[] excludes)
         {
             return _providers.Values.Select(s=>s.Name)
                 .Where(s => !excludes.Any(e => e == s)).ToArray();
         }
-
+        /// <summary>
+        /// Add a setting provider after construction time
+        /// </summary>
+        /// <param name="provider">The <seealso cref="ISettingsProvider"/> provider to be registered </param>
+        /// <param name="order">The loading order of the given provider. First found value is returned among providers.</param>
         public void AddSettingsProvider(ISettingsProvider provider, int order = 0 )
         {
             _providers.Add(order, provider);
         }
 
+        /// <summary>
+        /// Register a setting for retriviel.
+        /// 
+        /// </summary>
+        /// <param name="key"> Key is a local name for the setting that it can be queried on. If the key is already registered, it will be ignored</param>
+        /// <param name="name">The setting name to query providers for, if null the key is used.</param>
+        /// <param name="converter">A converter that takes the setting as a string and convert it to its object type.</param>
+        /// <param name="defaultvalue">The default value for the value.</param>
+        /// <param name="acceptnull">If true the setting can be returned as null if not found, otherwise exception will be trown that the setting is not found</param>
+        /// <param name="providers">The provider names to be used for looking up the setting</param>
         public void RegisterSetting(string key, Func<string> name = null, Func<string, object> converter = null, string defaultvalue = null, bool acceptnull = false, params string[] providers)
         {
             if (_lazies.ContainsKey(key))
@@ -71,10 +68,23 @@ namespace SInnovations.ConfigurationManager
 
         }
       
+        /// <summary>
+        /// Override any setting with a fixed value.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
         public void RegisterOverride<T>(string key, T value)
         {
             overrides.Add(key, value);
         }
+        /// <summary>
+        /// Return the setting, first in the overrideable set of settings , then from setting providers.
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public T GetSetting<T>(string key)
         {
             if (overrides.ContainsKey(key))
@@ -86,6 +96,13 @@ namespace SInnovations.ConfigurationManager
             return (T)_lazies[key].Value;
         }
 
+        /// <summary>
+        /// Try to get the setting and return true if it was found.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public bool TryGetSetting<T>(string key, out T value)
         {
 
@@ -106,6 +123,7 @@ namespace SInnovations.ConfigurationManager
         }
 
 
+        #region Helpers
         private ResetLazy<object> CreateLazy(Func<string> settingnameFunc, Func<string, object> converter = null, string defaultvalue = null, bool acceptnull = false, params string[] providers)
         {
             converter = converter ?? StringConverter;
@@ -159,5 +177,6 @@ namespace SInnovations.ConfigurationManager
 
             return val;
         }
+        #endregion
     }
 }

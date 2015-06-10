@@ -3,7 +3,9 @@ using System.Text;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SInnovations.ConfigurationManager.Providers;
-using Microsoft.KeyVault.Client;
+using Microsoft.Azure.KeyVault;
+
+
 
 namespace SInnovations.ConfigurationManager.Tests
 {

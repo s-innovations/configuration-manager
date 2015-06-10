@@ -1,56 +1,31 @@
-﻿using Microsoft.IdentityModel.Clients.ActiveDirectory;
-using Microsoft.KeyVault.Client;
+﻿using Microsoft.Azure.KeyVault;
+using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Newtonsoft.Json;
+
 using SInnovations.ConfigurationManager.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace SInnovations.ConfigurationManager.Providers
 {
-    public static class AzureKeyVaultDefaults
-    {
-        public const string DefaultKeyVaultUriKey = "Azure.KeyVault.Uri";
-        public const string DefaultAzureADClientIdKey = "Microsoft.Azure.AD.Application.ClientId";
-        public const string DefaultAzureADClientSecretKey = "Microsoft.Azure.AD.Application.ClientSecret";
-
-
-        public static void RegisterAzureKeyVaultSecret(this ConfigurationManager config, string name, string secretUri)
-        {
-            config.RegisterSetting(name, () => secretUri, (str) => JsonConvert.DeserializeObject<Secret>(str));
-        }
-        public static Secret GetAzureKeyVaultSecret(this ConfigurationManager config, string name)
-        {
-            return config.GetSetting<Secret>(name);
-        }
-    }
-    public class AzureKeyVaultSettingsProviderOptions
-    {
-     
-        public AzureKeyVaultSettingsProviderOptions()
-        {
-            KeyVaultUriKey = AzureKeyVaultDefaults.DefaultKeyVaultUriKey;
-            AzureApplicationClientIdKey = AzureKeyVaultDefaults.DefaultAzureADClientIdKey;
-            AzureApplicationClientSecretKey = AzureKeyVaultDefaults.DefaultAzureADClientSecretKey;
-        }
-        public string KeyVaultUriKey { get; set; }
-        public string AzureApplicationClientIdKey { get; set; }
-        public string AzureApplicationClientSecretKey { get; set; }
-        public string KeyVaultUri { get; set; }
-        public string ClientId { get; set; }
-        public string ClientSecret { get; set; }
-        public ConfigurationManager ConfigurationManager{get;set;}
-
-    }
+   
+   
     public class AzureKeyVaultSettingsProvider : ISettingsProvider
     {
+
         private static ILog Logger = LogProvider.GetCurrentClassLogger();
         private Lazy<KeyVaultClient> keyVaultClient;
         private AzureKeyVaultSettingsProviderOptions _options;
         private ConfigurationManager _config;
-      
+        private const string name = "azure.keyvault";
+        public string Name
+        {
+            get { return name; }
+        }
 
         public AzureKeyVaultSettingsProvider(AzureKeyVaultSettingsProviderOptions options) 
         {
@@ -71,18 +46,16 @@ namespace SInnovations.ConfigurationManager.Providers
             }
 
             keyVaultClient = new Lazy<KeyVaultClient>(() =>
-            {
-                
-                
+            {                
                 return new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(GetAccessToken));
 
             });
            
         }
-        private string GetAccessToken(string authority, string resource, string scope)
+        private async Task<string> GetAccessToken(string authority, string resource, string scope)
         {
             var context = new AuthenticationContext(authority, null);
-            var result = context.AcquireToken(resource, ClientCredentials);
+            var result = await context.AcquireTokenAsync(resource, ClientCredentials);
 
             return result.AccessToken;
         }
@@ -107,11 +80,7 @@ namespace SInnovations.ConfigurationManager.Providers
             }
         }
 
-        private const string name = "azure.keyvault";
-        public string Name
-        {
-            get { return name; }
-        }
+      
 
         public bool TryGetSetting(string settingName, out string settingValue)
         {
@@ -132,5 +101,6 @@ namespace SInnovations.ConfigurationManager.Providers
 
             return true;
         }
+       
     }
 }
