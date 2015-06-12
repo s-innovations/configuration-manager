@@ -15,10 +15,19 @@ namespace SInnovations.ConfigurationManager.Providers
         public const string DefaultAzureADClientSecretKey = "Microsoft.Azure.AD.Application.ClientSecret";
 
 
-        public static void RegisterAzureKeyVaultSecret(this ConfigurationManager config, string name, string secretUri)
+        public static void RegisterAzureKeyVaultSecret(this ConfigurationManager config, string name, Uri secretUri)
         {
-            config.RegisterSetting(name, () => secretUri, (str) => JsonConvert.DeserializeObject<Secret>(str));
+            config.RegisterSetting(name, () => secretUri.AbsoluteUri, (str) => JsonConvert.DeserializeObject<Secret>(str));
         }
+
+        public static void RegisterAzureKeyVaultSecret(this ConfigurationManager config, string name, string secretName,string secretVersion=null)
+        {
+            config.RegisterSetting(name, () => string.Format("{0}/{1}/{2}",
+                config.GetSetting<string>(AzureKeyVaultDefaults.DefaultKeyVaultUriKey),
+                secretName, secretVersion).Trim('/'),
+                (str) => JsonConvert.DeserializeObject<Secret>(str));
+        }
+
         public static Secret GetAzureKeyVaultSecret(this ConfigurationManager config, string name)
         {
             return config.GetSetting<Secret>(name);
