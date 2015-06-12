@@ -96,6 +96,10 @@ namespace SInnovations.ConfigurationManager
             return (T)_lazies[key].Value;
         }
 
+        public string GetSetting(string key)
+        {
+            return GetSetting<string>(key);
+        }
         /// <summary>
         /// Try to get the setting and return true if it was found.
         /// </summary>
