@@ -20,9 +20,9 @@ namespace SInnovations.ConfigurationManager.Providers
             config.RegisterSetting(name, () => secretUri.AbsoluteUri, (str) => JsonConvert.DeserializeObject<Secret>(str));
         }
 
-        public static void RegisterAzureKeyVaultSecret(this ConfigurationManager config, string name, string secretName,string secretVersion=null)
+        public static void RegisterAzureKeyVaultSecret(this ConfigurationManager config, string secretName,string secretVersion=null,string name=null)
         {
-            config.RegisterSetting(name, () => string.Format("{0}/secrets/{1}/{2}",
+            config.RegisterSetting(name??secretName, () => string.Format("{0}/secrets/{1}/{2}",
                 config.GetSetting<string>(AzureKeyVaultDefaults.DefaultKeyVaultUriKey).Trim('/'),
                 secretName, secretVersion).Trim('/'),
                 (str) => JsonConvert.DeserializeObject<Secret>(str));
