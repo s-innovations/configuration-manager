@@ -22,6 +22,6 @@ namespace SInnovations.ConfigurationManager.Providers
         public string ClientId { get; set; }
         public string ClientSecret { get; set; }
         public ConfigurationManager ConfigurationManager { get; set; }
-
+        public Func<string, string> SecretConverter { get; set; }
     }
 }

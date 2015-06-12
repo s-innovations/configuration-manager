@@ -96,6 +96,7 @@
     <Compile Include="AzureKeyVaultDefaults.cs" />
     <Compile Include="AzureKeyVaultSettingsProvider.cs" />
     <Compile Include="AzureKeyVaultSettingsProviderOptions.cs" />
+    <Compile Include="AzureKeyVaultSettingsProviderRegistraitonExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -42,6 +42,7 @@ namespace SInnovations.ConfigurationManager.Providers
                     providers: providers);
                 _config.RegisterSetting(_options.AzureApplicationClientSecretKey,
                     defaultvalue: string.IsNullOrWhiteSpace(_options.ClientSecret) ? null : _options.ClientSecret,
+                    converter:_options.SecretConverter,
                     providers: providers);
             }
 
@@ -89,6 +90,7 @@ namespace SInnovations.ConfigurationManager.Providers
                 return false;
             try
             {
+
                 var secret = keyVaultClient.Value.GetSecretAsync(settingName).GetAwaiter().GetResult();
                 settingValue = JsonConvert.SerializeObject(secret);
 
