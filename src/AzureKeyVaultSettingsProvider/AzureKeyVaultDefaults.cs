@@ -23,7 +23,7 @@ namespace SInnovations.ConfigurationManager.Providers
         public static void RegisterAzureKeyVaultSecret(this ConfigurationManager config, string name, string secretName,string secretVersion=null)
         {
             config.RegisterSetting(name, () => string.Format("{0}/{1}/{2}",
-                config.GetSetting<string>(AzureKeyVaultDefaults.DefaultKeyVaultUriKey),
+                config.GetSetting<string>(AzureKeyVaultDefaults.DefaultKeyVaultUriKey).Trim('/'),
                 secretName, secretVersion).Trim('/'),
                 (str) => JsonConvert.DeserializeObject<Secret>(str));
         }
