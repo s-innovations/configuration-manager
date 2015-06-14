@@ -55,10 +55,18 @@ namespace SInnovations.ConfigurationManager.Providers
         }
         private async Task<string> GetAccessToken(string authority, string resource, string scope)
         {
-            var context = new AuthenticationContext(authority, null);
-            var result = await context.AcquireTokenAsync(resource, ClientCredentials);
+            try
+            {
+                var context = new AuthenticationContext(authority, null);
+                var result = await context.AcquireTokenAsync(resource, ClientCredentials);
 
-            return result.AccessToken;
+                return result.AccessToken;
+            }
+            catch (Exception ex)
+            {
+                Logger.ErrorException("Failed to get access token:",ex);
+                throw;
+            }
         }
 
         protected virtual ClientCredential ClientCredentials
@@ -85,9 +93,14 @@ namespace SInnovations.ConfigurationManager.Providers
 
         public bool TryGetSetting(string settingName, out string settingValue)
         {
+            Logger.InfoFormat("Trying to get setting {0}", settingName);
             settingValue = null;
-            if(!settingName.StartsWith(KeyVaultUri))
+            if (!settingName.StartsWith(KeyVaultUri))
+            {
+                Logger.WarnFormat("The setting did not start with the keyvault uri: {0}", KeyVaultUri);
+
                 return false;
+            }
             try
             {
 
