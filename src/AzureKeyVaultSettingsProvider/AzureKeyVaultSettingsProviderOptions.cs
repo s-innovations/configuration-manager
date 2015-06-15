@@ -14,6 +14,7 @@ namespace SInnovations.ConfigurationManager.Providers
             KeyVaultUriKey = AzureKeyVaultDefaults.DefaultKeyVaultUriKey;
             AzureApplicationClientIdKey = AzureKeyVaultDefaults.DefaultAzureADClientIdKey;
             AzureApplicationClientSecretKey = AzureKeyVaultDefaults.DefaultAzureADClientSecretKey;
+            LoadingOrder = 100;
         }
         public string KeyVaultUriKey { get; set; }
         public string AzureApplicationClientIdKey { get; set; }
@@ -23,5 +24,7 @@ namespace SInnovations.ConfigurationManager.Providers
         public string ClientSecret { get; set; }
         public ConfigurationManager ConfigurationManager { get; set; }
         public Func<string, string> SecretConverter { get; set; }
+
+        public int LoadingOrder { get; set; }
     }
 }

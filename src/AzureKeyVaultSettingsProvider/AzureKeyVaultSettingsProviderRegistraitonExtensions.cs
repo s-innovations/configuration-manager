@@ -14,7 +14,7 @@ namespace SInnovations.ConfigurationManager.Providers
            // RegisterSetting(AzureKeyVaultDefaults.DefaultAzureADClientSecretKey, converter: CryptoHelper.DecryptEnvelop);
 
             options.ConfigurationManager = manager;
-            manager.AddSettingsProvider(new AzureKeyVaultSettingsProvider(options));
+            manager.AddSettingsProvider(new AzureKeyVaultSettingsProvider(options),options.LoadingOrder);
             return manager;
         }
     }
