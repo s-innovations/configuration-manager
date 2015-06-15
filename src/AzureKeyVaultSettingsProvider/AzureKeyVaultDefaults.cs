@@ -30,7 +30,17 @@ namespace SInnovations.ConfigurationManager.Providers
 
         public static Secret GetAzureKeyVaultSecret(this ConfigurationManager config, string name)
         {
-            return config.GetSetting<Secret>(name);
+            Secret value;
+            if(!config.TryGetSetting<Secret>(name, out value))
+            {
+                config.RegisterAzureKeyVaultSecret(name);
+                config.TryGetSetting<Secret>(name, out value);
+            }
+            if (value == null)
+                throw new Exception(string.Format("Could not get secret {0}", name));
+            
+            return value;
         }
+       
     }
 }
