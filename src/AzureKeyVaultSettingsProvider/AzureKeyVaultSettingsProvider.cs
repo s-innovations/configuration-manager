@@ -1,9 +1,9 @@
 ﻿using Microsoft.Azure.KeyVault;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Newtonsoft.Json;
-
 using SInnovations.ConfigurationManager.Logging;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
@@ -12,8 +12,8 @@ using System.Threading.Tasks;
 
 namespace SInnovations.ConfigurationManager.Providers
 {
-   
-   
+
+
     public class AzureKeyVaultSettingsProvider : ISettingsProvider
     {
 
@@ -27,7 +27,7 @@ namespace SInnovations.ConfigurationManager.Providers
             get { return name; }
         }
 
-        public AzureKeyVaultSettingsProvider(AzureKeyVaultSettingsProviderOptions options) 
+        public AzureKeyVaultSettingsProvider(AzureKeyVaultSettingsProviderOptions options)
         {
             _options = options;
             _config = _options.ConfigurationManager;
@@ -36,35 +36,48 @@ namespace SInnovations.ConfigurationManager.Providers
                 var providers = _config.GetProviders(Name);
                 _config.RegisterSetting(_options.KeyVaultUriKey,
                     defaultvalue: string.IsNullOrWhiteSpace(_options.KeyVaultUri) ? null : _options.KeyVaultUri,
-                    providers: providers);   
+                    providers: providers);
                 _config.RegisterSetting(_options.AzureApplicationClientIdKey,
                     defaultvalue: string.IsNullOrWhiteSpace(_options.ClientId) ? null : _options.ClientId,
                     providers: providers);
                 _config.RegisterSetting(_options.AzureApplicationClientSecretKey,
                     defaultvalue: string.IsNullOrWhiteSpace(_options.ClientSecret) ? null : _options.ClientSecret,
-                    converter:_options.SecretConverter,
+                    converter: _options.SecretConverter,
                     providers: providers);
             }
 
             keyVaultClient = new Lazy<KeyVaultClient>(() =>
-            {                
+            {
                 return new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(GetAccessToken));
 
             });
-           
+
+        }
+        private ConcurrentDictionary<string, Lazy<Task<AuthenticationContext>>> _authCache = new ConcurrentDictionary<string, Lazy<Task<AuthenticationContext>>>();
+        private Lazy<Task<AuthenticationContext>> CreateContext(string key)
+        {
+            return new Lazy<Task<AuthenticationContext>>(async () =>
+            {
+                var parts = key.Split(',');
+                var context = new AuthenticationContext(parts[0], new TokenCache());
+                var result = await context.AcquireTokenAsync(parts[1], ClientCredentials);
+                return context;
+            });
         }
         private async Task<string> GetAccessToken(string authority, string resource, string scope)
         {
+            Logger.InfoFormat("Getting Access Token : {0}, {1}", authority, resource);
             try
             {
-                var context = new AuthenticationContext(authority, null);
+
+                var context = await _authCache.GetOrAdd(string.Join(",", authority, resource), CreateContext).Value;
                 var result = await context.AcquireTokenAsync(resource, ClientCredentials);
 
                 return result.AccessToken;
             }
             catch (Exception ex)
             {
-                Logger.ErrorException("Failed to get access token:",ex);
+                Logger.ErrorException("Failed to get access token:", ex);
                 throw;
             }
         }
@@ -89,7 +102,7 @@ namespace SInnovations.ConfigurationManager.Providers
             }
         }
 
-      
+
 
         public bool TryGetSetting(string settingName, out string settingValue)
         {
@@ -108,7 +121,7 @@ namespace SInnovations.ConfigurationManager.Providers
                 settingValue = JsonConvert.SerializeObject(secret);
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Logger.ErrorException("Failed to get KeyVault Setting", ex);
                 return false;
@@ -116,6 +129,6 @@ namespace SInnovations.ConfigurationManager.Providers
 
             return true;
         }
-       
+
     }
 }

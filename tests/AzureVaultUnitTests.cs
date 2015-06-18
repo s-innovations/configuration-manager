@@ -4,11 +4,37 @@ using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SInnovations.ConfigurationManager.Providers;
 using Microsoft.Azure.KeyVault;
+using System.Security.Cryptography;
+using System.Security.Cryptography.Pkcs;
+using System.Security.Cryptography.X509Certificates;
 
 
 
 namespace SInnovations.ConfigurationManager.Tests
 {
+    public static class CryptoHelper
+    {
+        public static string GetRandomKey(int length = 256)
+        {
+            using (var r = new RNGCryptoServiceProvider())
+            {
+                var bytes = new byte[length];
+                r.GetBytes(bytes);
+                return Convert.ToBase64String(bytes);
+            }
+        }
+
+        public static string DecryptEnvelop(string base64EncryptedString)
+        {
+            var encryptedBytes = Convert.FromBase64String(base64EncryptedString);
+            var envelope = new EnvelopedCms();
+            envelope.Decode(encryptedBytes);
+            var store = new X509Store(StoreName.My, StoreLocation.LocalMachine);
+            store.Open(OpenFlags.ReadOnly);
+            envelope.Decrypt(store.Certificates);
+            return Encoding.UTF8.GetString(envelope.ContentInfo.Content);
+        }
+    }
     /// <summary>
     /// Summary description for AzureVaultUnitTests
     /// </summary>
@@ -71,13 +97,14 @@ namespace SInnovations.ConfigurationManager.Tests
                 var options = new AzureKeyVaultSettingsProviderOptions
                 {
                     ConfigurationManager = config, //Used to get the clientid,secret and uri of vault.
+                    SecretConverter = CryptoHelper.DecryptEnvelop
+
                 };
                 config.AddSettingsProvider(new AzureKeyVaultSettingsProvider(options));
 
-                config.RegisterAzureKeyVaultSecret("sendgrid_secret",
-                    "{vault_uri}/secrets/{scrent_name}/{secret_id}");
+                config.RegisterAzureKeyVaultSecret("sendgrid_secret");
 
-            
+                
 
             //In your application do IoC.Resolve<ConfigurationManager>();
                 var secret = config.GetSetting<Secret>("sendgrid_secret");
