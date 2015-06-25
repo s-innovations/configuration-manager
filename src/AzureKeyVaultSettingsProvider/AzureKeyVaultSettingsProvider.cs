@@ -53,14 +53,14 @@ namespace SInnovations.ConfigurationManager.Providers
             });
 
         }
-        private ConcurrentDictionary<string, Lazy<Task<AuthenticationContext>>> _authCache = new ConcurrentDictionary<string, Lazy<Task<AuthenticationContext>>>();
-        private Lazy<Task<AuthenticationContext>> CreateContext(string key)
+        private ConcurrentDictionary<string, Lazy<AuthenticationContext>> _authCache = new ConcurrentDictionary<string, Lazy<AuthenticationContext>>();
+        private Lazy<AuthenticationContext> CreateContext(string key)
         {
-            return new Lazy<Task<AuthenticationContext>>(async () =>
+            return new Lazy<AuthenticationContext>(() =>
             {
                 var parts = key.Split(',');
                 var context = new AuthenticationContext(parts[0], new TokenCache());
-                var result = await context.AcquireTokenAsync(parts[1], ClientCredentials);
+                //var result = await context.AcquireTokenAsync(parts[1], ClientCredentials);
                 return context;
             });
         }
@@ -70,7 +70,7 @@ namespace SInnovations.ConfigurationManager.Providers
             try
             {
 
-                var context = await _authCache.GetOrAdd(string.Join(",", authority, resource), CreateContext).Value;
+                var context = _authCache.GetOrAdd(string.Join(",", authority, resource), CreateContext).Value;
                 var result = await context.AcquireTokenAsync(resource, ClientCredentials);
 
                 return result.AccessToken;
