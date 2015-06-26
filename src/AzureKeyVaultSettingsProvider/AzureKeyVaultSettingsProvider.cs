@@ -5,6 +5,7 @@ using SInnovations.ConfigurationManager.Logging;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -67,11 +68,14 @@ namespace SInnovations.ConfigurationManager.Providers
         private async Task<string> GetAccessToken(string authority, string resource, string scope)
         {
             Logger.InfoFormat("Getting Access Token : {0}, {1}", authority, resource);
+            Trace.TraceInformation("Getting Access Token : {0}, {1}", authority, resource);
             try
             {
 
                 var context = _authCache.GetOrAdd(string.Join(",", authority, resource), CreateContext).Value;
-                var result = await context.AcquireTokenAsync(resource, ClientCredentials);
+                var task = context.AcquireTokenAsync(resource, ClientCredentials);
+                task.Wait(5000);
+                var result = await task;
 
                 return result.AccessToken;
             }
