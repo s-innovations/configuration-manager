@@ -22,10 +22,11 @@ namespace SInnovations.ConfigurationManager.Providers
         private Lazy<KeyVaultClient> keyVaultClient;
         private AzureKeyVaultSettingsProviderOptions _options;
         private ConfigurationManager _config;
-        private const string name = "azure.keyvault";
+       
+        public const string AzureKeyVaultSettingsProviderName = "azure.keyvault";
         public string Name
         {
-            get { return name; }
+            get { return AzureKeyVaultSettingsProviderName; }
         }
 
         public AzureKeyVaultSettingsProvider(AzureKeyVaultSettingsProviderOptions options)
@@ -112,6 +113,8 @@ namespace SInnovations.ConfigurationManager.Providers
         {
             Logger.InfoFormat("Trying to get setting {0}", settingName);
             settingValue = null;
+
+
             if (!settingName.StartsWith(KeyVaultUri))
             {
                 Logger.WarnFormat("The setting did not start with the keyvault uri: {0}", KeyVaultUri);
@@ -121,7 +124,7 @@ namespace SInnovations.ConfigurationManager.Providers
             try
             {
 
-                var secret = keyVaultClient.Value.GetSecretAsync(settingName).GetAwaiter().GetResult();
+                var secret =  Task.Run(()=> keyVaultClient.Value.GetSecretAsync(settingName)).GetAwaiter().GetResult();
                 settingValue = JsonConvert.SerializeObject(secret);
 
             }
