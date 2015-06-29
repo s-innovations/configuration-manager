@@ -20,6 +20,8 @@ namespace SInnovations.ConfigurationManager.Providers
 
         private static ILog Logger = LogProvider.GetCurrentClassLogger();
         private Lazy<KeyVaultClient> keyVaultClient;
+        private Lazy<SecretItem[]> allSecrets;
+
         private AzureKeyVaultSettingsProviderOptions _options;
         private ConfigurationManager _config;
        
@@ -52,6 +54,11 @@ namespace SInnovations.ConfigurationManager.Providers
             {
                 return new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(GetAccessToken));
 
+            });
+            allSecrets = new Lazy<SecretItem[]>(() =>
+            {
+                var secrets = Task.Run(()=> this.keyVaultClient.Value.GetSecretsAsync(this.KeyVaultUri)).GetAwaiter().GetResult();
+                return secrets.Value.ToArray();
             });
 
         }
@@ -114,6 +121,12 @@ namespace SInnovations.ConfigurationManager.Providers
             Logger.InfoFormat("Trying to get setting {0}", settingName);
             settingValue = null;
 
+            if (!allSecrets.Value.Any(s => settingName.StartsWith(s.Id)))
+            {
+                Logger.WarnFormat("The setting was not found: {0}", string.Join(", ",allSecrets.Value.Select(s=>s.Id)));
+
+                return false;
+            }
 
             if (!settingName.StartsWith(KeyVaultUri))
             {
