@@ -16,6 +16,7 @@ namespace SInnovations.ConfigurationManager
     {
         private static ILog Logger = LogProvider.GetCurrentClassLogger();
 
+        private Dictionary<string, string> nameToKey = new Dictionary<string, string>();
         private Dictionary<string, object> overrides = new Dictionary<string, object>();
         private readonly ConcurrentDictionary<string, ResetLazy<object>> _lazies = new ConcurrentDictionary<string,ResetLazy<object>>();
         private SortedList<int, ISettingsProvider> _providers = new SortedList<int, ISettingsProvider>(new DuplicateKeyComparer<int>());
@@ -46,8 +47,35 @@ namespace SInnovations.ConfigurationManager
         /// <param name="order">The loading order of the given provider. First found value is returned among providers.</param>
         public void AddSettingsProvider(ISettingsProvider provider, int order = 0 )
         {
+            var observable = provider as IObservableSettingProvider;
+            if (observable != null)
+            {
+                observable.SettingHasBeenUpdated += observable_SettingHasBeenUpdated;
+            }
+
             _providers.Add(order, provider);
         }
+
+        void observable_SettingHasBeenUpdated(object sender, SettingChangedEventArgs e)
+        {
+            var key = e.SettingName;
+            if (nameToKey.ContainsKey(key))
+                key = nameToKey[key];
+
+            if (_lazies.ContainsKey(key))
+                _lazies[key].Reset();
+
+            OnSettingHasBeenUpdated(e);
+        }
+
+        protected virtual void OnSettingHasBeenUpdated(SettingChangedEventArgs e)
+        {
+            if (SettingHasBeenUpdated != null)
+            {
+                SettingHasBeenUpdated(this, e);
+            }
+        }
+        public event EventHandler<SettingChangedEventArgs> SettingHasBeenUpdated;
 
         /// <summary>
         /// Register a setting for retriviel.
@@ -64,9 +92,14 @@ namespace SInnovations.ConfigurationManager
             if (_lazies.ContainsKey(key))
                 return;
             int tries = 10;
-            while (!_lazies.TryAdd(key, CreateLazy(name ?? (() => key), converter, defaultvalue, acceptnull, providers)) && tries-- > 0) ;
-
+            var nameFunc = name ?? (() => key);
+            while (!_lazies.TryAdd(key, CreateLazy(nameFunc, converter, defaultvalue, acceptnull, providers)) && tries-- > 0) ;
+            if (tries > 0)
+            {
+                nameToKey.Add(nameFunc(), key);
+            }
         }
+
       
         /// <summary>
         /// Override any setting with a fixed value.
@@ -131,6 +164,7 @@ namespace SInnovations.ConfigurationManager
         private ResetLazy<object> CreateLazy(Func<string> settingnameFunc, Func<string, object> converter = null, string defaultvalue = null, bool acceptnull = false, params string[] providers)
         {
             converter = converter ?? StringConverter;
+            
             return new ResetLazy<object>(() =>
             {
                 var settingname = settingnameFunc();

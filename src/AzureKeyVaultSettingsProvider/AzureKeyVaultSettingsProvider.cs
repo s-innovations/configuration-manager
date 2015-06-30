@@ -1,6 +1,7 @@
 ﻿using Microsoft.Azure.KeyVault;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Newtonsoft.Json;
+using SInnovations.ConfigurationManager.Configuration;
 using SInnovations.ConfigurationManager.Logging;
 using System;
 using System.Collections.Concurrent;
@@ -15,22 +16,66 @@ namespace SInnovations.ConfigurationManager.Providers
 {
 
 
-    public class AzureKeyVaultSettingsProvider : ISettingsProvider
+    public class AzureKeyVaultSettingsProvider : ISettingsProvider, IObservableSettingProvider
     {
 
         private static ILog Logger = LogProvider.GetCurrentClassLogger();
         private Lazy<KeyVaultClient> keyVaultClient;
-        private Lazy<SecretItem[]> allSecrets;
+        private ResetLazy<SecretItem[]> allSecrets;
 
         private AzureKeyVaultSettingsProviderOptions _options;
         private ConfigurationManager _config;
-       
+
+        private System.Timers.Timer _idleCheckTimer;
+        private Dictionary<string, Secret> _loadedSecrets = new Dictionary<string, Secret>();
+
         public const string AzureKeyVaultSettingsProviderName = "azure.keyvault";
         public string Name
         {
             get { return AzureKeyVaultSettingsProviderName; }
         }
+        private void SetIdleCheckTimer()
+        {
 
+            _idleCheckTimer = new System.Timers.Timer(TimeSpan.FromMinutes(10).TotalMilliseconds);
+            _idleCheckTimer.AutoReset = false;
+            _idleCheckTimer.Elapsed += new System.Timers.ElapsedEventHandler(OnIdleCheckTimer);
+            _idleCheckTimer.Start();
+        }
+        private void OnIdleCheckTimer(object sender, System.Timers.ElapsedEventArgs e)
+        {
+
+            try
+            {
+                if (_loadedSecrets.Any())
+                {
+                    var all = _loadedSecrets;
+                    _loadedSecrets = new Dictionary<string, Secret>();//Reset the settinglist;
+
+                    allSecrets.Reset();
+                    foreach (var name in all.Keys)
+                    {
+                        var value = all[name];
+                        var meta = allSecrets.Value.FirstOrDefault(s => s.Id == value.Id);
+                        if (meta != null && meta.Attributes.Updated > value.Attributes.Updated)
+                        {
+                            OnSettingHasBeenUpdated(new SettingChangedEventArgs { SettingName = name, Provider = this });
+                        }
+                    }
+
+
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+            finally
+            {
+                SetIdleCheckTimer();
+            }
+
+        }
         public AzureKeyVaultSettingsProvider(AzureKeyVaultSettingsProviderOptions options)
         {
             _options = options;
@@ -55,9 +100,9 @@ namespace SInnovations.ConfigurationManager.Providers
                 return new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(GetAccessToken));
 
             });
-            allSecrets = new Lazy<SecretItem[]>(() =>
+            allSecrets = new ResetLazy<SecretItem[]>(() =>
             {
-                var secrets = Task.Run(()=> this.keyVaultClient.Value.GetSecretsAsync(this.KeyVaultUri)).GetAwaiter().GetResult();
+                var secrets = Task.Run(() => this.keyVaultClient.Value.GetSecretsAsync(this.KeyVaultUri)).GetAwaiter().GetResult();
                 return secrets.Value.ToArray();
             });
 
@@ -75,7 +120,7 @@ namespace SInnovations.ConfigurationManager.Providers
         }
         private async Task<string> GetAccessToken(string authority, string resource, string scope)
         {
-          
+
             try
             {
 
@@ -122,21 +167,16 @@ namespace SInnovations.ConfigurationManager.Providers
 
             if (!allSecrets.Value.Any(s => settingName.StartsWith(s.Id)))
             {
-                Logger.WarnFormat("The setting was not found: {0}", string.Join(", ",allSecrets.Value.Select(s=>s.Id)));
+                Logger.WarnFormat("The setting was not found: {0}", string.Join(", ", allSecrets.Value.Select(s => s.Id)));
 
                 return false;
             }
 
-            if (!settingName.StartsWith(KeyVaultUri))
-            {
-                Logger.WarnFormat("The setting did not start with the keyvault uri: {0}", KeyVaultUri);
-
-                return false;
-            }
             try
             {
 
-                var secret =  Task.Run(()=> keyVaultClient.Value.GetSecretAsync(settingName)).GetAwaiter().GetResult();
+                var secret = Task.Run(() => keyVaultClient.Value.GetSecretAsync(settingName)).GetAwaiter().GetResult();
+                _loadedSecrets[Name] = secret;
                 settingValue = JsonConvert.SerializeObject(secret);
 
             }
@@ -149,5 +189,14 @@ namespace SInnovations.ConfigurationManager.Providers
             return true;
         }
 
+
+        protected virtual void OnSettingHasBeenUpdated(SettingChangedEventArgs e)
+        {
+            if (SettingHasBeenUpdated != null)
+            {
+                SettingHasBeenUpdated(this, e);
+            }
+        }
+        public event EventHandler<SettingChangedEventArgs> SettingHasBeenUpdated;
     }
 }

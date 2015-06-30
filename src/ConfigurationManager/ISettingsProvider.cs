@@ -12,4 +12,14 @@ namespace SInnovations.ConfigurationManager
        
         bool TryGetSetting(string settingName, out string settingValue);
     }
+    public class SettingChangedEventArgs : EventArgs
+    {
+        // class members
+        public string SettingName { get; set; }
+        public ISettingsProvider Provider { get; set; }
+    }
+    public interface IObservableSettingProvider
+    {
+        event EventHandler<SettingChangedEventArgs> SettingHasBeenUpdated;
+    }
 }
