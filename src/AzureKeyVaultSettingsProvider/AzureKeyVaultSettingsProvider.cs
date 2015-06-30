@@ -75,8 +75,7 @@ namespace SInnovations.ConfigurationManager.Providers
         }
         private async Task<string> GetAccessToken(string authority, string resource, string scope)
         {
-            Logger.InfoFormat("Getting Access Token : {0}, {1}", authority, resource);
-            Trace.TraceInformation("Getting Access Token : {0}, {1}", authority, resource);
+          
             try
             {
 

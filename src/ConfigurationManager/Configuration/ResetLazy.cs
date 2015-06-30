@@ -53,6 +53,10 @@ namespace SInnovations.ConfigurationManager.Configuration
             get { return declaringType; }
         }
 
+        protected virtual T ValueFactory()
+        {
+            return valueFactory();
+        }
         public T Value
         {
             get
@@ -69,7 +73,7 @@ namespace SInnovations.ConfigurationManager.Configuration
                         if (b2 != null)
                             return b2.Value;
 
-                        this.box = new Box(valueFactory());
+                        this.box = new Box(ValueFactory());
 
                         return box.Value;
                     }
@@ -77,7 +81,7 @@ namespace SInnovations.ConfigurationManager.Configuration
 
                 else if (mode == LazyThreadSafetyMode.PublicationOnly)
                 {
-                    var newValue = valueFactory();
+                    var newValue = ValueFactory();
 
                     lock (syncLock)
                     {
@@ -92,7 +96,7 @@ namespace SInnovations.ConfigurationManager.Configuration
                 }
                 else
                 {
-                    var b = new Box(valueFactory());
+                    var b = new Box(ValueFactory());
                     this.box = b;
                     return b.Value;
                 }
@@ -122,6 +126,49 @@ namespace SInnovations.ConfigurationManager.Configuration
             else
             {
                 this.box = null;
+            }
+        }
+    }
+
+    public class PeriodicResetLazy<T> : ResetLazy<T>
+    {
+        public static TimeSpan DEFAULT_RESET_TIMER = TimeSpan.FromMinutes(5);
+
+        private readonly Func<bool> _onReset;
+        private readonly TimeSpan _resetTimer;
+        private System.Timers.Timer _idleCheckTimer;
+        public PeriodicResetLazy(Func<T> valueFactory,Func<bool> onReset=null, TimeSpan? resetTimer = null, LazyThreadSafetyMode mode = LazyThreadSafetyMode.PublicationOnly, Type declaringType = null)
+            : base(valueFactory,mode,declaringType)
+        {
+            _resetTimer = resetTimer.HasValue ? resetTimer.Value : DEFAULT_RESET_TIMER;
+            _onReset = onReset;
+        }
+
+        protected override T ValueFactory()
+        {
+            SetResetTimer();
+            return base.ValueFactory();
+        }
+       
+        private void SetResetTimer()
+        {
+
+            _idleCheckTimer = new System.Timers.Timer(_resetTimer.TotalMilliseconds);
+            _idleCheckTimer.AutoReset = false;
+            _idleCheckTimer.Elapsed += new System.Timers.ElapsedEventHandler(OnIdleCheckTimer);
+            _idleCheckTimer.Start();
+        }
+
+        private void OnIdleCheckTimer(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            if (_onReset != null && _onReset())
+            {
+                _idleCheckTimer = null;
+                this.Reset();
+            }
+            else
+            {
+                SetResetTimer();
             }
         }
     }
