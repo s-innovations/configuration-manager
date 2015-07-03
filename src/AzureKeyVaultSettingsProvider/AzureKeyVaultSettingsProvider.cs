@@ -176,7 +176,7 @@ namespace SInnovations.ConfigurationManager.Providers
             {
 
                 var secret = Task.Run(() => keyVaultClient.Value.GetSecretAsync(settingName)).GetAwaiter().GetResult();
-                _loadedSecrets[Name] = secret;
+                _loadedSecrets[settingName] = secret;
                 settingValue = JsonConvert.SerializeObject(secret);
 
             }
