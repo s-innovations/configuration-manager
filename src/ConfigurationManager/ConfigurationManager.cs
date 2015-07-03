@@ -58,6 +58,8 @@ namespace SInnovations.ConfigurationManager
 
         void observable_SettingHasBeenUpdated(object sender, SettingChangedEventArgs e)
         {
+            Logger.InfoFormat("Setting updated : {0},{1}", e.Provider.Name, e.SettingName);
+
             var key = e.SettingName;
             if (nameToKey.ContainsKey(key))
                 key = nameToKey[key];
