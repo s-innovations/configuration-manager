@@ -44,7 +44,7 @@ namespace SInnovations.ConfigurationManager.Providers
         }
         private void OnIdleCheckTimer(object sender, System.Timers.ElapsedEventArgs e)
         {
-
+            Logger.Trace("Checking for Settings Changes");
             try
             {
                 if (_loadedSecrets.Any())
@@ -57,8 +57,12 @@ namespace SInnovations.ConfigurationManager.Providers
                     {
                         var value = all[name];
                         var meta = allSecrets.Value.FirstOrDefault(s => s.Id == value.Id);
+                        
                         if (meta != null && meta.Attributes.Updated > value.Attributes.Updated)
                         {
+                            Logger.TraceFormat("Found secret {0} that has been updated at {1}", meta.Id, meta.Attributes.Updated);
+                            
+
                             OnSettingHasBeenUpdated(new SettingChangedEventArgs { SettingName = name, Provider = this });
                         }
                     }
@@ -102,8 +106,11 @@ namespace SInnovations.ConfigurationManager.Providers
             });
             allSecrets = new ResetLazy<SecretItem[]>(() =>
             {
+                Logger.Trace("Fetching all settings metadata");
                 var secrets = Task.Run(() => this.keyVaultClient.Value.GetSecretsAsync(this.KeyVaultUri)).GetAwaiter().GetResult();
-                return secrets.Value.ToArray();
+                var secretsValue = secrets.Value.ToArray();
+                Logger.TraceFormat("Found {0} settings: {1}", secretsValue.Length, string.Join(", ",secretsValue.Select(s=>string.Format("{0}={1}",s.Id,s.Attributes.Updated))));
+                return secretsValue;
             });
 
         }
