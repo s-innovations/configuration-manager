@@ -47,9 +47,11 @@ namespace SInnovations.ConfigurationManager
         /// <param name="order">The loading order of the given provider. First found value is returned among providers.</param>
         public void AddSettingsProvider(ISettingsProvider provider, int order = 0 )
         {
+            Logger.TraceFormat("Adding settings provider : {0}", provider.Name);
             var observable = provider as IObservableSettingProvider;
             if (observable != null)
             {
+                Logger.TraceFormat("Registering events on observable settings provider : {0}", provider.Name);
                 observable.SettingHasBeenUpdated += observable_SettingHasBeenUpdated;
             }
 
