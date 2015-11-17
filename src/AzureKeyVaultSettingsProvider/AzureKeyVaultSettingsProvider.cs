@@ -18,6 +18,10 @@ namespace SInnovations.ConfigurationManager.Providers
 
     public class AzureKeyVaultSettingsProvider : ISettingsProvider, IObservableSettingProvider
     {
+        private static string NoEncrypter(string s)
+        {
+            return s;
+        }
 
         private static ILog Logger = LogProvider.GetCurrentClassLogger();
         private Lazy<KeyVaultClient> keyVaultClient;
@@ -107,7 +111,7 @@ namespace SInnovations.ConfigurationManager.Providers
                     providers: providers);
                 _config.RegisterSetting(_options.AzureApplicationClientSecretKey,
                     defaultvalue: string.IsNullOrWhiteSpace(_options.ClientSecret) ? null : _options.ClientSecret,
-                    converter: _options.SecretConverter,
+                    converter: _options.SecretConverter ?? NoEncrypter,
                     providers: providers);
             }
 
