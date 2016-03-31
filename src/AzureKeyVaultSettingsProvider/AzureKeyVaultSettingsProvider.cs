@@ -103,16 +103,28 @@ namespace SInnovations.ConfigurationManager.Providers
             if (_config != null)
             {
                 var providers = _config.GetProviders(Name);
+
                 _config.RegisterSetting(_options.KeyVaultUriKey,
                     defaultvalue: string.IsNullOrWhiteSpace(_options.KeyVaultUri) ? null : _options.KeyVaultUri,
                     providers: providers);
-                _config.RegisterSetting(_options.AzureApplicationClientIdKey,
-                    defaultvalue: string.IsNullOrWhiteSpace(_options.ClientId) ? null : _options.ClientId,
-                    providers: providers);
-                _config.RegisterSetting(_options.AzureApplicationClientSecretKey,
-                    defaultvalue: string.IsNullOrWhiteSpace(_options.ClientSecret) ? null : _options.ClientSecret,
+
+
+                if (options.UseKeyVaultCredentialsKey)
+                {
+                    _config.RegisterSetting(_options.KeyVaultCredentialsKey,
                     converter: _options.SecretConverter ?? NoEncrypter,
                     providers: providers);
+                }
+                else
+                {
+                    _config.RegisterSetting(_options.AzureApplicationClientIdKey,
+                  defaultvalue: string.IsNullOrWhiteSpace(_options.ClientId) ? null : _options.ClientId,
+                  providers: providers);
+                    _config.RegisterSetting(_options.AzureApplicationClientSecretKey,
+                        defaultvalue: string.IsNullOrWhiteSpace(_options.ClientSecret) ? null : _options.ClientSecret,
+                        converter: _options.SecretConverter ?? NoEncrypter,
+                        providers: providers);
+                }
             }
 
             keyVaultClient = new Lazy<KeyVaultClient>(() =>
@@ -165,11 +177,22 @@ namespace SInnovations.ConfigurationManager.Providers
         {
             get
             {
-                return new ClientCredential(_config == null ?
-                    _options.ClientId : _config.GetSetting<string>(_options.AzureApplicationClientIdKey),
-                    _config == null ?
-                    _options.ClientSecret : _config.GetSetting<string>(_options.AzureApplicationClientSecretKey)
-                    );
+              
+                if(_config == null)
+                {
+                    return new ClientCredential(_options.ClientId, _options.ClientSecret);
+                }
+                else if (_options.UseKeyVaultCredentialsKey)
+                {
+                    var both = _config.GetSetting<string>(_options.KeyVaultCredentialsKey).Split(':');
+                    return new ClientCredential(both.First(), both.Last());
+                }
+                else
+                {
+                    return new ClientCredential(_config.GetSetting<string>(_options.AzureApplicationClientIdKey), _config.GetSetting<string>(_options.AzureApplicationClientSecretKey));
+
+                }
+               
             }
         }
         protected virtual string KeyVaultUri

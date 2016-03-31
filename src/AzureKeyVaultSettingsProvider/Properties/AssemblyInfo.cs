@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("AzureKeyVaultSettingsProvider")]
+[assembly: AssemblyTitle("S-Innovations.ConfigurationManager.AzureKeyVaultSettingsProvider")]
 [assembly: AssemblyDescription("Azure Key Vault Settings Provider for S-Innovations Configuration Manager")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyProduct("AzureKeyVaultSettingsProvider")]
-[assembly: AssemblyCopyright("Copyright ©  2015")]
+[assembly: AssemblyProduct("S-Innovations.ConfigurationManager.AzureKeyVaultSettingsProvider")]
+[assembly: AssemblyCopyright("Copyright ©  2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -33,5 +33,5 @@ using System.Runtime.InteropServices;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
-[assembly: AssemblyInformationalVersion("1.0.0")]
+[assembly: AssemblyInformationalVersion("2.0.0")]
 [assembly: AssemblyCompany("S-Innovations v/Poul K. Sørensen")]

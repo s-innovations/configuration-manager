@@ -1,5 +1,8 @@
 
 # S-Innovations Configuration Manager
+===========================
+![](https://sinnovations.visualstudio.com/DefaultCollection/_apis/public/build/definitions/40c16cc5-bf99-47d4-a814-56c38cc0ea24/8/badge)
+
 
 A small lib that I been using for the past few years for azure solutions that I am making public. 
 I am moving the stable parts into this as I get my private repro refactored alittle.

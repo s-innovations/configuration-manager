@@ -17,6 +17,7 @@ namespace SInnovations.ConfigurationManager.Providers
         public const string DefaultAzureADClientIdKey = "Microsoft.Azure.AD.Application.ClientId";
         public const string DefaultAzureADClientSecretKey = "Microsoft.Azure.AD.Application.ClientSecret";
 
+        public const string DefaultKeyVaultCredentials = "Azure.KeyVault.Credentials";
 
         public static void RegisterAzureKeyVaultSecret(this ConfigurationManager config, string name, Uri secretUri)
         {
@@ -82,7 +83,7 @@ namespace SInnovations.ConfigurationManager.Providers
             SecureString value;
             if (!config.TryGetSetting<SecureString>(name, out value))
             {
-                config.RegisterAzureKeyVaultSecret(name);
+                config.RegisterAzureKeyVaultSecretSecureString(name);
                 config.TryGetSetting<SecureString>(name, out value);
             }
             if (value == null)
