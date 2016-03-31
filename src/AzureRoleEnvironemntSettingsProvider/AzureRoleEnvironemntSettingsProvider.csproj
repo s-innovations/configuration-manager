@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SInnovations.ConfigurationManager.AzureRoleEnvironemntSettingsProvider</RootNamespace>
     <AssemblyName>S-Innovations.ConfigurationManager.AzureRoleEnvironemntSettingsProvider</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -44,13 +45,13 @@
     <Compile Include="RoleEnvironmentSettingsProvider.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="AzureRoleEnvironemntSettingsProvider.nuspec" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\ConfigurationManager\ConfigurationManager.csproj">
       <Project>{df8f42df-2e9a-48c3-94fe-f7fa1bb4af34}</Project>
       <Name>ConfigurationManager</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="S-Innovations.ConfigurationManager.AzureKeyVaultSettingsProvider.nuspec" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

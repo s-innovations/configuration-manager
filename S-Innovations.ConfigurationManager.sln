@@ -15,6 +15,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "tests\Tests.csproj", "{5720CEE5-EF6C-4868-801E-4BF9AEC30160}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfigurationManager.CryptoExtensions", "src\ConfigurationManager.CryptoExtensions\ConfigurationManager.CryptoExtensions.csproj", "{624EFA1F-788D-48F9-A09D-34E73A3E7063}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureRoleEnvironemntSettingsProvider", "src\AzureRoleEnvironemntSettingsProvider\AzureRoleEnvironemntSettingsProvider.csproj", "{89A9F7D3-D026-4A4C-BBB7-139346CF7091}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +37,14 @@ Global
 		{5720CEE5-EF6C-4868-801E-4BF9AEC30160}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5720CEE5-EF6C-4868-801E-4BF9AEC30160}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5720CEE5-EF6C-4868-801E-4BF9AEC30160}.Release|Any CPU.Build.0 = Release|Any CPU
+		{624EFA1F-788D-48F9-A09D-34E73A3E7063}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{624EFA1F-788D-48F9-A09D-34E73A3E7063}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{624EFA1F-788D-48F9-A09D-34E73A3E7063}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{624EFA1F-788D-48F9-A09D-34E73A3E7063}.Release|Any CPU.Build.0 = Release|Any CPU
+		{89A9F7D3-D026-4A4C-BBB7-139346CF7091}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{89A9F7D3-D026-4A4C-BBB7-139346CF7091}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{89A9F7D3-D026-4A4C-BBB7-139346CF7091}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{89A9F7D3-D026-4A4C-BBB7-139346CF7091}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
