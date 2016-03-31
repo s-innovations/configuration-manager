@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("S-Innovations.ConfigurationManager.AzureRoleEnvironemntSettingsProvider")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Azure Cloud Service Configuration Settings Provider")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("S-Innovations v/Poul Kjeldager Sørensen")]
 [assembly: AssemblyProduct("S-Innovations.ConfigurationManager.AzureRoleEnvironemntSettingsProvider")]
