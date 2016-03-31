@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("ConfigurationManager.CryptoExtensions")]
+[assembly: AssemblyTitle("S-Innovations.ConfigurationManager.CryptoExtensions")]
 [assembly: AssemblyDescription("Crypto extensions for ConfigurationManager")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("S-Innovations")]
-[assembly: AssemblyProduct("ConfigurationManager.CryptoExtensions")]
+[assembly: AssemblyCompany("S-Innovations v/Poul Kjeldager Sørensen")]
+[assembly: AssemblyProduct("S-Innovations.ConfigurationManager.CryptoExtensions")]
 [assembly: AssemblyCopyright("Copyright ©  2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

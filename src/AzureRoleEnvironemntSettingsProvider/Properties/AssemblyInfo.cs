@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("AzureRoleEnvironemntSettingsProvider")]
+[assembly: AssemblyTitle("S-Innovations.ConfigurationManager.AzureRoleEnvironemntSettingsProvider")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("AzureRoleEnvironemntSettingsProvider")]
+[assembly: AssemblyCompany("S-Innovations v/Poul Kjeldager Sørensen")]
+[assembly: AssemblyProduct("S-Innovations.ConfigurationManager.AzureRoleEnvironemntSettingsProvider")]
 [assembly: AssemblyCopyright("Copyright ©  2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
