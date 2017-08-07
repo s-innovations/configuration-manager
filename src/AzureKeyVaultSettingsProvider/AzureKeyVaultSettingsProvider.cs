@@ -1,4 +1,5 @@
 ﻿using Microsoft.Azure.KeyVault;
+using Microsoft.Azure.KeyVault.Models;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Newtonsoft.Json;
 using SInnovations.ConfigurationManager.Configuration;
@@ -31,7 +32,7 @@ namespace SInnovations.ConfigurationManager.Providers
         private ConfigurationManager _config;
 
         private System.Timers.Timer _idleCheckTimer;
-        private Dictionary<string, Secret> _loadedSecrets = new Dictionary<string, Secret>();
+        private Dictionary<string, SecretBundle> _loadedSecrets = new Dictionary<string, SecretBundle>();
 
         public const string AzureKeyVaultSettingsProviderName = "azure.keyvault";
         public string Name
@@ -55,7 +56,7 @@ namespace SInnovations.ConfigurationManager.Providers
                 if (_loadedSecrets.Any())
                 {
                     var all = _loadedSecrets;
-                    _loadedSecrets = new Dictionary<string, Secret>();//Reset the settinglist;
+                    _loadedSecrets = new Dictionary<string, SecretBundle>();//Reset the settinglist;
 
                     allSecrets.Reset();
                     foreach (var name in all.Keys)
@@ -136,7 +137,7 @@ namespace SInnovations.ConfigurationManager.Providers
             {
                 Logger.Trace("Fetching all settings metadata");
                 var secrets = Task.Run(() => this.keyVaultClient.Value.GetSecretsAsync(this.KeyVaultUri)).GetAwaiter().GetResult();
-                var secretsValue = secrets.Value.ToArray();
+                var secretsValue = secrets.ToArray();
                 Logger.TraceFormat("Found {0} settings: {1}", secretsValue.Length, string.Join(", ", secretsValue.Select(s => string.Format("{0}={1}", s.Id, s.Attributes.Updated))));
                 return secretsValue;
             });

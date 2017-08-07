@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Security;
 using System.Runtime.InteropServices;
+using Microsoft.Azure.KeyVault.Models;
 
 namespace SInnovations.ConfigurationManager.Providers
 {
@@ -21,7 +22,7 @@ namespace SInnovations.ConfigurationManager.Providers
 
         public static void RegisterAzureKeyVaultSecret(this ConfigurationManager config, string name, Uri secretUri)
         {
-            config.RegisterSetting(name, () => secretUri.AbsoluteUri, (str) => JsonConvert.DeserializeObject<Secret>(str));
+            config.RegisterSetting(name, () => secretUri.AbsoluteUri, (str) => JsonConvert.DeserializeObject<SecretBundle>(str));
         }
 
         public static void RegisterAzureKeyVaultSecret(this ConfigurationManager config, string secretName,string secretVersion=null,string name=null)
@@ -29,14 +30,14 @@ namespace SInnovations.ConfigurationManager.Providers
             config.RegisterSetting(name??secretName, () => string.Format("{0}/secrets/{1}/{2}",
                 config.GetSetting<string>(AzureKeyVaultDefaults.DefaultKeyVaultUriKey).Trim('/'),
                 secretName, secretVersion).Trim('/'),
-                (str) => JsonConvert.DeserializeObject<Secret>(str));
+                (str) => JsonConvert.DeserializeObject<SecretBundle>(str));
         }
         public static void RegisterAzureKeyVaultSecretSecureString(this ConfigurationManager config, string secretName, string secretVersion = null, string name = null)
         {
             config.RegisterSetting(name ?? secretName, () => string.Format("{0}/secrets/{1}/{2}",
                   config.GetSetting<string>(AzureKeyVaultDefaults.DefaultKeyVaultUriKey).Trim('/'),
                   secretName, secretVersion).Trim('/'),
-                (str) => convertToSecureString( JsonConvert.DeserializeObject<Secret>(str).Value));
+                (str) => convertToSecureString( JsonConvert.DeserializeObject<SecretBundle>(str).Value));
         }
         public static SecureString convertToSecureString(string strPassword)
         {
@@ -64,13 +65,13 @@ namespace SInnovations.ConfigurationManager.Providers
             }
         }
 
-        public static Secret GetAzureKeyVaultSecret(this ConfigurationManager config, string name)
+        public static SecretBundle GetAzureKeyVaultSecret(this ConfigurationManager config, string name)
         {
-            Secret value;
-            if(!config.TryGetSetting<Secret>(name, out value))
+            SecretBundle value;
+            if(!config.TryGetSetting<SecretBundle>(name, out value))
             {
                 config.RegisterAzureKeyVaultSecret(name);
-                config.TryGetSetting<Secret>(name, out value);
+                config.TryGetSetting<SecretBundle>(name, out value);
             }
             if (value == null)
                 throw new Exception(string.Format("Could not get secret {0}", name));
